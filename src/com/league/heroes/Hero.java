@@ -3,7 +3,7 @@ package com.league.heroes;
 public class Hero {
     private String name;
 
-    Hero(name) {
+    Hero(String name) {
         this.name = name;
     }
 
