@@ -12,13 +12,17 @@ buildscript {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
         classpath 'org.gretty:gretty:3.0.7'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.16'
-        
-
+        classpath "io.freefair.gradle:lombok-plugin:6.6.1"
     }
+}
+
+plugins {
+    id "io.freefair.lombok" version "6.6.1"
 }
 
 allprojects {
     apply plugin: "eclipse"
+    apply plugin: "io.freefair.lombok"
 
     version = '1.0'
     ext {
@@ -50,7 +54,6 @@ project(":desktop") {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        
     }
 }
 
@@ -90,7 +93,8 @@ project(":core") {
 
 
     dependencies {
+        implementation 'com.googlecode.json-simple:json-simple:1.1'
+        implementation 'io.socket:socket.io-client:2.1.0'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        
     }
 }
