@@ -17,9 +17,7 @@ public class Hero {
     }
 
     public  void draw(ShapeRenderer shape) {
-        shape.begin(ShapeRenderer.ShapeType.Filled);
         shape.rect(xPos, yPos, size/2, size);
-        shape.end();
     }
 
 }
