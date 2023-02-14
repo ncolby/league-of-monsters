@@ -1,4 +1,4 @@
-package com.league.game.heroes.Utils;
+package com.league.game.Utils;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
