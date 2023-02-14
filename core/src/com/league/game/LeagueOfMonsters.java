@@ -24,16 +24,16 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 	JSONParser parser;
 	JSONObject gameState;
 
-	private Map<String, Hero> heroesState;
-	private Map<String, JSONObject> heroes;
+	private Map<String, Hero> heroes;
+	private Map<String, JSONObject> heroesState;
 	Socket socket;
 
 	@Override
 	public void create () {
 		gameState = new JSONObject();
 		parser = new JSONParser();
-		heroesState = new HashMap<>();
 		heroes = new HashMap<>();
+		heroesState = new HashMap<>();
 		gameState.put("xPos", 100L);
 		gameState.put("yPos", 100L);
 		shape = new ShapeRenderer();
@@ -44,16 +44,18 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 				@Override
 				public void call(Object... args) {
 					Hero hero = Hero.builder().xPos(50L).yPos(50L).size(50).build();
-					heroesState.put(socket.id(), hero);
-					heroes.put(socket.id(), new JSONObject());
-					heroes.get(socket.id()).put("xPos", 50L);
-					heroes.get(socket.id()).put("yPos", 50L);
+					heroes.put(socket.id(), hero);
+					heroesState.put(socket.id(), new JSONObject());
+					heroesState.get(socket.id()).put("xPos", 50L);
+					heroesState.get(socket.id()).put("yPos", 50L);
 					System.out.println("Connected to Game Server");
+
 				}
 			});
 			socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
+					socket.emit("disconnect");
 					System.out.println("Disconnected from Game Server");
 				}
 			});
@@ -63,15 +65,18 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 					try {
 						gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
 						JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
-						StateManager.updateStateOfAllHeroes(connectedPlayers, heroes);
-						for (Map.Entry<String, JSONObject> hero: heroes.entrySet()) {
+						StateManager.updateStateOfAllHeroes(connectedPlayers, heroesState);
+						for (Map.Entry<String, JSONObject> hero: heroesState.entrySet()) {
 							String playerId = hero.getKey();
-							if (heroesState.containsKey(playerId)) {
-								heroesState.get(playerId).update(hero.getValue());
+							if (heroes.containsKey(playerId)) {
+								heroes.get(playerId).update(hero.getValue());
 							} else {
-								heroesState.put(playerId, Hero.builder().xPos(50L).yPos(50L).size(50).build());
+								heroes.put(playerId, Hero.builder().xPos(50L).yPos(50L).size(50).build());
 							}
 						}
+						System.out.println(connectedPlayers);
+						System.out.println("-----------------------------");
+						System.out.println(heroesState);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -107,7 +112,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 			}
 		}
 		shape.begin(ShapeRenderer.ShapeType.Filled);
-		for (Map.Entry<String, Hero> hero : heroesState.entrySet()) {
+		for (Map.Entry<String, Hero> hero : heroes.entrySet()) {
 			hero.getValue().draw(shape);
 		}
 		shape.end();
