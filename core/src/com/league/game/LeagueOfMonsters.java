@@ -3,8 +3,10 @@ package com.league.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -28,6 +30,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 	private Texture movementSpriteSheet;
 	private SpriteBatch spriteBatch;
 	private float animationDuration;
+	private OrthographicCamera playerCamera;
 
 	private TextureRegion currentFrame;
 
@@ -43,8 +46,13 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 	private Map<String, JSONObject> heroesState;
 	Socket socket;
 
+	private static Texture backgroundTexture;
+	private static Sprite backgroundSprite;
+
 	@Override
 	public void create () {
+		backgroundTexture = new Texture("background.png");
+		backgroundSprite = new Sprite(backgroundTexture);
 		gameState = new JSONObject();
 		parser = new JSONParser();
 		heroes = new HashMap<>();
@@ -53,6 +61,9 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 		animationDuration = 0f;
 		gameState.put("xPos", 100L);
 		gameState.put("yPos", 100L);
+		playerCamera = new OrthographicCamera(1280, 720);
+		playerCamera.position.set(50, 50, 0);
+		playerCamera.update();
 		movementSpriteSheet = new Texture(Gdx.files.internal("pumpkin_head_walk.png"));
 		shape = new ShapeRenderer();
 		hero = Hero.builder().xPos(50).yPos(50).size(50).build();
@@ -75,7 +86,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 			socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
-					Hero hero = Hero.builder().xPos(50L).yPos(50L).size(50).build();
+					hero = Hero.builder().xPos(50L).yPos(50L).size(50).build();
 					heroes.put(socket.id(), hero);
 					heroesState.put(socket.id(), new JSONObject());
 					heroesState.get(socket.id()).put("xPos", 50L);
@@ -125,39 +136,37 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 0);
 		animationDuration += Gdx.graphics.getDeltaTime();
-		currentFrame = movementFrames[4];
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			if (socket != null) {
 				socket.emit("command", "left");
-				currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
 			}
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
 			if (socket != null) {
 				socket.emit("command", "right");
-				currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
 			}
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			if (socket != null) {
 				socket.emit("command", "up");
-				currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
 			}
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			if (socket != null) {
 				socket.emit("command", "down");
-				currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
 			}
 		}
-//		shape.begin(ShapeRenderer.ShapeType.Filled);
+		System.out.println(playerCamera.position);
+		playerCamera.position.set(hero.getXPos(), 0, 0);
+		playerCamera.update();
+		spriteBatch.setProjectionMatrix(playerCamera.combined);
 		spriteBatch.begin();
+		backgroundSprite.draw(spriteBatch);
 		for (Map.Entry<String, Hero> hero : heroes.entrySet()) {
-//			hero.getValue().draw(shape);
-			hero.getValue().animate(spriteBatch, currentFrame);
+			hero.getValue().draw(spriteBatch, currentFrame);
 		}
 		spriteBatch.end();
-//		shape.end();
+		currentFrame = movementFrames[4];
 	}
 	
 	@Override
