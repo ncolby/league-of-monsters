@@ -2,7 +2,6 @@ package com.league.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -11,8 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.league.game.Utils.InputHandler;
 import com.league.game.heroes.Hero;
-import com.league.game.heroes.Utils.StateManager;
+import com.league.game.Utils.StateManager;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -58,6 +58,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 		heroes = new HashMap<>();
 		heroesState = new HashMap<>();
 		spriteBatch = new SpriteBatch();
+		hero = Hero.builder().xPos(50L).yPos(50L).size(50).build();
 		animationDuration = 0f;
 		gameState.put("xPos", 100L);
 		gameState.put("yPos", 100L);
@@ -66,8 +67,6 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 		playerCamera.update();
 		movementSpriteSheet = new Texture(Gdx.files.internal("pumpkin_head_walk.png"));
 		shape = new ShapeRenderer();
-		hero = Hero.builder().xPos(50).yPos(50).size(50).build();
-
 		TextureRegion[][] movementSpriteSheetSplits = TextureRegion.
 				split(movementSpriteSheet, movementSpriteSheet.getWidth() / SPRITE_COLS
 						, movementSpriteSheet.getHeight() / SPRITE_ROWS);
@@ -98,6 +97,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 			socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
+					// TODO: on an event of a disconnect, we should send a signal to try to reconnect
 					socket.emit("disconnect");
 					System.out.println("Disconnected from Game Server");
 				}
@@ -136,34 +136,14 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 	public void render () {
 		ScreenUtils.clear(0, 0, 0, 0);
 		animationDuration += Gdx.graphics.getDeltaTime();
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			if (socket != null) {
-				socket.emit("command", "left");
-			}
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			if (socket != null) {
-				socket.emit("command", "right");
-			}
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			if (socket != null) {
-				socket.emit("command", "up");
-			}
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			if (socket != null) {
-				socket.emit("command", "down");
-			}
-		}
-		System.out.println(playerCamera.position);
+		InputHandler.handleInput(socket);
 		playerCamera.position.set(hero.getXPos(), 0, 0);
 		playerCamera.update();
 		spriteBatch.setProjectionMatrix(playerCamera.combined);
 		spriteBatch.begin();
 		backgroundSprite.draw(spriteBatch);
-		for (Map.Entry<String, Hero> hero : heroes.entrySet()) {
-			hero.getValue().draw(spriteBatch, currentFrame);
+		for (Map.Entry<String, Hero> localHero : heroes.entrySet()) {
+			localHero.getValue().draw(spriteBatch, currentFrame);
 		}
 		spriteBatch.end();
 		currentFrame = movementFrames[4];
