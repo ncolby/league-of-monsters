@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.league.game.Utils.InputHandler;
 import com.league.game.heroes.Hero;
 import com.league.game.Utils.StateManager;
+import com.league.game.models.Nexus;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -44,6 +45,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 
 	private Map<String, Hero> heroes;
 	private Map<String, JSONObject> heroesState;
+	private Nexus nexus;
 	Socket socket;
 
 	private static Texture backgroundTexture;
@@ -51,6 +53,8 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		nexus = Nexus.builder().xPos(2000L).yPos(-100).build();
+		nexus.setNexusSprite("nexus.png");
 		backgroundTexture = new Texture("background.png");
 		backgroundSprite = new Sprite(backgroundTexture);
 		gameState = new JSONObject();
@@ -108,19 +112,8 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 					try {
 						gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
 						JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
-						StateManager.updateStateOfAllHeroes(connectedPlayers, heroesState);
-						for (Map.Entry<String, JSONObject> hero: heroesState.entrySet()) {
-							String playerId = hero.getKey();
-							if (heroes.containsKey(playerId)) {
-								heroes.get(playerId).update(hero.getValue());
-							} else {
-								heroes.put(playerId, Hero.builder().xPos(50L).yPos(50L).size(50).build());
-							}
-						}
+						heroes = StateManager.replicateServerState(connectedPlayers);
 						currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
-						System.out.println(connectedPlayers);
-						System.out.println("-----------------------------");
-						System.out.println(heroesState);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -142,6 +135,7 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 		spriteBatch.setProjectionMatrix(playerCamera.combined);
 		spriteBatch.begin();
 		backgroundSprite.draw(spriteBatch);
+		nexus.draw(spriteBatch);
 		for (Map.Entry<String, Hero> localHero : heroes.entrySet()) {
 			localHero.getValue().draw(spriteBatch, currentFrame);
 		}

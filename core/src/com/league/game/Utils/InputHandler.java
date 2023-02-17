@@ -28,6 +28,25 @@ public class InputHandler {
                 socket.emit("command", "down");
             }
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.J)) {
+            if (socket != null) {
+                socket.emit("command", "skill_1");
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.K)) {
+            if (socket != null) {
+                socket.emit("command", "skill_2");
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.L)) {
+            if (socket != null) {
+                socket.emit("command", "skill_3");
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.H)) {
+            if (socket != null) {
+                socket.emit("command", "skill_4");
+            }
+        }
     }
-
 }
