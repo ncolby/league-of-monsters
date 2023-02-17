@@ -19,6 +19,7 @@ import io.socket.emitter.Emitter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -102,11 +103,13 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 					System.out.println("Disconnected from Game Server");
 				}
 			});
-			socket.on("updateState", new Emitter.Listener() {
+			socket.on("updatedState", new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
 					try {
-						gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
+						gameState = getGameStateFromServer();
+						// System.out.println(gameState);
+						// gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
 						JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
 						StateManager.updateStateOfAllHeroes(connectedPlayers, heroesState);
 						for (Map.Entry<String, JSONObject> hero: heroesState.entrySet()) {
@@ -131,6 +134,25 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 			System.out.println(e.getMessage());
 		}
 	}
+
+	public JSONObject getGameStateFromServer() {
+		final JSONObject[] currentState = {new JSONObject()};
+		final JSONArray[] currentPlayersArray = {new JSONArray()};
+		socket.emit("getState");
+		socket.on("updatedState", new Emitter.Listener() {
+			@Override
+			public void call(Object... args) {
+				currentPlayersArray[0] = args[0];
+
+				currentState[0] = (JSONObject) args[0].get("connected");
+
+
+
+			}
+		});
+		System.out.println(currentState[0]);
+		return currentState[0];
+	};
 
 	@Override
 	public void render () {
