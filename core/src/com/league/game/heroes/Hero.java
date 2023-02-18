@@ -16,11 +16,8 @@ public class Hero {
     private int size;
 
     private String heroId;
-
-    public void update(JSONObject gameState) {
-        xPos = (long) gameState.get("xPos");
-        yPos = (long) gameState.get("yPos");
-    }
+    private boolean isAttacking;
+    private boolean isMoving;
 
     public void draw(SpriteBatch spriteBatch, TextureRegion movementFrame) {
         spriteBatch.draw(movementFrame, xPos, yPos);

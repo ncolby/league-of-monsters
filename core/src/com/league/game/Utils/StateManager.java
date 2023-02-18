@@ -38,6 +38,8 @@ public class StateManager {
     private static void mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState, Map<String, Hero> heroMap) {
         long xPos = (long) jsonObjectState.get("xPos");
         long yPos = (long) jsonObjectState.get("yPos");
-        heroMap.put(playerId, Hero.builder().xPos(xPos).yPos(yPos).build());
+        boolean isAttacking = (boolean) jsonObjectState.get("isAttacking");
+        boolean isMoving = (boolean) jsonObjectState.get("isMoving");
+        heroMap.put(playerId, Hero.builder().xPos(xPos).yPos(yPos).isAttacking(isAttacking).isMoving(isMoving).heroId(playerId).build());
     }
 }
