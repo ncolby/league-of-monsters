@@ -83,13 +83,13 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 			}
 		}
 
-		heroMovementAnimation = new Animation<TextureRegion>(0.025f, movementFrames);
+		heroMovementAnimation = new Animation<TextureRegion>(0.15f, movementFrames);
 		try {
 			socket = IO.socket("http://localhost:3000");
 			socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
-					hero = Hero.builder().xPos(50L).yPos(50L).size(50).build();
+					hero = Hero.builder().xPos(50L).yPos(50L).size(50).heroId(socket.id()).build();
 					heroes.put(socket.id(), hero);
 					heroesState.put(socket.id(), new JSONObject());
 					heroesState.get(socket.id()).put("xPos", 50L);
@@ -113,7 +113,6 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 						gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
 						JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
 						heroes = StateManager.replicateServerState(connectedPlayers);
-						currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -130,21 +129,30 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 		ScreenUtils.clear(0, 0, 0, 0);
 		animationDuration += Gdx.graphics.getDeltaTime();
 		InputHandler.handleInput(socket);
-		playerCamera.position.set(hero.getXPos(), 0, 0);
-		playerCamera.update();
 		spriteBatch.setProjectionMatrix(playerCamera.combined);
+		socket.emit("getState");
 		spriteBatch.begin();
 		backgroundSprite.draw(spriteBatch);
 		nexus.draw(spriteBatch);
 		for (Map.Entry<String, Hero> localHero : heroes.entrySet()) {
+			if (localHero.getKey().equals(hero.getHeroId())) {
+				playerCamera.position.set(localHero.getValue().getXPos(), 0, 0);
+				playerCamera.update();
+			}
+			if (localHero.getValue().isMoving()) {
+				currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
+			} else {
+				currentFrame = movementFrames[4];
+			}
 			localHero.getValue().draw(spriteBatch, currentFrame);
 		}
 		spriteBatch.end();
-		currentFrame = movementFrames[4];
 	}
 	
 	@Override
 	public void dispose () {
 		shape.dispose();
+		spriteBatch.dispose();
+		movementSpriteSheet.dispose();
 	}
 }

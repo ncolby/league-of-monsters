@@ -10,7 +10,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
-        classpath 'org.gretty:gretty:3.0.7'
+        classpath 'org.gretty:gretty:4.0.3'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.16'
         classpath "io.freefair.gradle:lombok-plugin:6.6.1"
     }
