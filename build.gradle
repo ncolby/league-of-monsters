@@ -71,7 +71,7 @@ project(":desktop") {
 project(":ios") {
     apply plugin: "java-library"
     apply plugin: "robovm"
-
+    apply plugin: 'io.spring.dependency-management'
 
     dependencies {
         implementation project(":core")
@@ -79,7 +79,13 @@ project(":ios") {
         api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        
+        apply plugin: 'io.spring.dependency-management'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
+        }
     }
 }
 
@@ -88,6 +94,7 @@ project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
     apply plugin: "org.gretty"
+    apply plugin: 'io.spring.dependency-management'
 
 
     dependencies {
@@ -95,7 +102,13 @@ project(":html") {
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        
+        implementation 'org.springframework.boot:spring-boot-starter'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
+        }
     }
 }
 
