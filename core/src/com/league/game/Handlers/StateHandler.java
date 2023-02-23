@@ -1,5 +1,6 @@
-package com.league.game.Utils;
+package com.league.game.Handlers;
 
+import com.league.game.enums.FacingDirection;
 import com.league.game.heroes.Hero;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -7,7 +8,7 @@ import org.json.simple.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StateManager {
+public class StateHandler {
     /**
      * PlayersOnServer is an JSONArray of JSONArrays
      * playersOnServer Structure:
@@ -19,7 +20,7 @@ public class StateManager {
     public static Map<String, Hero> replicateServerState(JSONArray playersOnServer) {
         JSONObject playerState;
         String playerId;
-        Map<String, Hero> newPlayersOnClient = new HashMap<>();
+        Map<String, Hero> newPlayersOnClient = new HashMap<String, Hero>();
 
         // Each player would represent the inner JSONArray, and playersOnServer would be the outer JSONArray
         // playersOnServer = [[player1id , player1State], [player2id , player2State]]
@@ -36,10 +37,18 @@ public class StateManager {
 
     // This maps the JSONObject values to the Hero Object values
     private static void mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState, Map<String, Hero> heroMap) {
-        long xPos = (long) jsonObjectState.get("xPos");
-        long yPos = (long) jsonObjectState.get("yPos");
-        boolean isAttacking = (boolean) jsonObjectState.get("isAttacking");
-        boolean isMoving = (boolean) jsonObjectState.get("isMoving");
-        heroMap.put(playerId, Hero.builder().xPos(xPos).yPos(yPos).isAttacking(isAttacking).isMoving(isMoving).heroId(playerId).build());
+        long xPos = (Long) jsonObjectState.get("xPos");
+        long yPos = (Long) jsonObjectState.get("yPos");
+        boolean isAttacking = (Boolean) jsonObjectState.get("isAttacking");
+        boolean isMoving = (Boolean) jsonObjectState.get("isMoving");
+        String direction = (String) jsonObjectState.get("facingDirection");
+        FacingDirection facingDirection = FacingDirection.NONE;
+        if (direction.equals(FacingDirection.LEFT.getDirection())) {
+           facingDirection = FacingDirection.LEFT;
+        } else if (direction.equals(FacingDirection.RIGHT.getDirection())){
+            facingDirection = FacingDirection.RIGHT;
+        }
+        heroMap.put(playerId, Hero.builder().xPos(xPos).yPos(yPos).isAttacking(isAttacking).facingDirection(facingDirection).isMoving(isMoving).heroId(playerId).build());
+
     }
 }

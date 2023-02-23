@@ -1,4 +1,4 @@
-package com.league.game.Utils;
+package com.league.game.Handlers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

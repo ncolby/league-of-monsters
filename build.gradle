@@ -18,11 +18,14 @@ buildscript {
 
 plugins {
     id "io.freefair.lombok" version "6.6.1"
+    id "io.spring.dependency-management" version "1.0.8.RELEASE"
 }
 
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "io.freefair.lombok"
+    apply plugin: 'io.spring.dependency-management'
+
 
     version = '1.0'
     ext {
@@ -48,12 +51,20 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java-library"
+    apply plugin: 'io.spring.dependency-management'
 
 
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        implementation 'org.springframework.boot:spring-boot-starter'
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
+        }
     }
 }
 
@@ -90,11 +101,18 @@ project(":html") {
 
 project(":core") {
     apply plugin: "java-library"
-
+    apply plugin: 'io.spring.dependency-management'
 
     dependencies {
         implementation 'com.googlecode.json-simple:json-simple:1.1'
         implementation 'io.socket:socket.io-client:2.1.0'
+        implementation 'org.springframework.boot:spring-boot-starter'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
+        }
     }
 }
