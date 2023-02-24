@@ -4,16 +4,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
+//@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class GameEntity {
-   private long xPos;
-   private long yPos;
-   private long width;
-   private long height;
+   private long xPos = 0;
+   private long yPos = 0;
+   private long width = 0;
+   private long height = 0;
    private TextureRegion entityImage;
 
    public void draw(SpriteBatch spriteBatch) {
