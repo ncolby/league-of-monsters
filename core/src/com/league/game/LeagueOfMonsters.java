@@ -5,15 +5,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.league.game.enums.FacingDirection;
 import com.league.game.Handlers.InputHandler;
-import com.league.game.heroes.Hero;
 import com.league.game.Handlers.StateHandler;
+import com.league.game.models.HeroGameEntity;
 import com.league.game.models.Nexus;
 import com.league.game.utils.ImageProcessor;
 import io.socket.client.IO;
@@ -30,45 +30,44 @@ import java.util.Map;
 
 @SpringBootApplication
 public class LeagueOfMonsters extends ApplicationAdapter {
+	private static final int VIEWPORT_HEIGHT = 500;
+	private static final int VIEWPORT_WIDTH = 1000;
 	private Animation<TextureRegion> heroMovementAnimation;
 	private Animation<TextureRegion> heroAttackAnimation;
-
 	private Animation<TextureRegion> heroAbilityAnimation;
 	private TextureRegion heroIdleAnimation;
 	private SpriteBatch spriteBatch;
 	private float animationDuration;
 	private OrthographicCamera playerCamera;
 	private TextureRegion currentFrame;
-
 	private TextureRegion abilityFrame;
-
-	private ShapeRenderer shape;
 	private JSONParser parser;
 	private JSONObject gameState;
-	private Map<String, Hero> heroes;
+
+	private Map<String, HeroGameEntity> heroes;
 	private Nexus nexus;
 	private Socket socket;
-	private static Texture backgroundTexture;
-	private static Sprite backgroundSprite;
+	private Texture backgroundTexture;
+	private TextureRegion backgroundTextureRegion;
+	private Viewport viewport;
+
 
 	@Override
 	public void create () {
 		SpringApplication.run(LeagueOfMonsters.class);
+		playerCamera = new OrthographicCamera();
+		viewport = new FitViewport(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, playerCamera);
+		playerCamera.position.set(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0);
+
 		nexus = Nexus.builder().xPos(2000L).yPos(-100).build();
 		nexus.setNexusSprite("nexus.png");
-		backgroundTexture = new Texture("background.png");
-		backgroundSprite = new Sprite(backgroundTexture);
-		backgroundSprite.setSize( 3645, 1024);
-		backgroundSprite.setPosition(120, 235);
+		backgroundTexture = new Texture("gamemap.png");
+		backgroundTextureRegion = new TextureRegion(backgroundTexture);
 		gameState = new JSONObject();
 		parser = new JSONParser();
-		heroes = new HashMap<String, Hero>();
+		heroes = new HashMap<String, HeroGameEntity>();
 		spriteBatch = new SpriteBatch();
 		animationDuration = 0f;
-		playerCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		playerCamera.position.set(0, 0, 0);
-		playerCamera.update();
-		shape = new ShapeRenderer();
 		heroMovementAnimation = ImageProcessor.getImageAnimation("pumpkin_head_walk.png");
 		heroAttackAnimation = ImageProcessor.getImageAnimation("pumpkin_head_attack.png");
 		heroIdleAnimation = ImageProcessor.getImageStill("pumpkin_head_walk.png");
@@ -78,7 +77,9 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 			socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 				@Override
 				public void call(Object... args) {
-					heroes.put(socket.id(), Hero.builder().xPos(0).yPos(0).facingDirection(FacingDirection.NONE).heroId(socket.id()).build());
+					heroes.put(socket.id(), new HeroGameEntity(
+							0, 0, 0, 0, null, 0,
+							null,false, false, FacingDirection.NONE, socket.id()));
 					System.out.println("Connected to Game Server");
 				}
 			});
@@ -110,17 +111,17 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(0, 240, 0, 0);
+		ScreenUtils.clear(0, 0, 0, 0);
 		animationDuration += Gdx.graphics.getDeltaTime();
 		InputHandler.handleInput(socket);
 		spriteBatch.setProjectionMatrix(playerCamera.combined);
 		socket.emit("getState");
 		spriteBatch.begin();
 		nexus.draw(spriteBatch);
-		backgroundSprite.draw(spriteBatch);
-		for (Map.Entry<String, Hero> hero : heroes.entrySet()) {
+		spriteBatch.draw(backgroundTextureRegion, 0, 0);
+		for (Map.Entry<String, HeroGameEntity> hero : heroes.entrySet()) {
 			if (hero.getKey().equals(socket.id())) {
-				playerCamera.position.set(hero.getValue().getXPos()  + 150, hero.getValue().getYPos() + 240, 0);
+				playerCamera.position.x = hero.getValue().getXPos();
 				playerCamera.update();
 			}
 			if (hero.getValue().isMoving()) {
@@ -132,24 +133,24 @@ public class LeagueOfMonsters extends ApplicationAdapter {
 				currentFrame = heroIdleAnimation;
 				abilityFrame = null;
 			}
-			hero.getValue().draw(spriteBatch, currentFrame);
-			if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
-				hero.getValue().drawAbility(spriteBatch, abilityFrame, hero.getValue().getXPos() - 200, hero.getValue().getYPos());
-			} else if ( abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.RIGHT)) {
-				hero.getValue().drawAbility(spriteBatch, abilityFrame, hero.getValue().getXPos() + 100, hero.getValue().getYPos());
-			}
+			hero.getValue().setEntityImage(currentFrame);
+			hero.getValue().draw(spriteBatch);
+//			if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
+//				hero.getValue().drawAbility(spriteBatch, abilityFrame, hero.getValue().getXPos() - 200, hero.getValue().getYPos());
+//			} else if ( abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.RIGHT)) {
+//				hero.getValue().drawAbility(spriteBatch, abilityFrame, hero.getValue().getXPos() + 100, hero.getValue().getYPos());
+//			}
 		}
 		spriteBatch.end();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		super.resize(width, height);
+		viewport.update(width, height);
 	}
 	
 	@Override
 	public void dispose () {
-		shape.dispose();
 		spriteBatch.dispose();
 		backgroundTexture.dispose();
 	}
