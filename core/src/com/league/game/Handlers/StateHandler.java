@@ -22,10 +22,12 @@ public class StateHandler {
         String playerId;
         Map<String, HeroGameEntity> newPlayersOnClient = new HashMap<String, HeroGameEntity>();
 
-        // Each player would represent the inner JSONArray, and playersOnServer would be the outer JSONArray
-        // playersOnServer = [[player1id , player1State], [player2id , player2State]]
-        // playerOnServer = [player1d , player1State], it is a JSONArray
-        // player1State = { "xPos" : 100L, "yPos" : 100L }, it is a json object
+        /**
+         Each player would represent the inner JSONArray, and playersOnServer would be the outer JSONArray
+         playersOnServer = [[player1id , player1State], [player2id , player2State]]
+         playerOnServer = [player1d , player1State], it is a JSONArray
+         player1State = { "xPos" : 100L, "yPos" : 100L }, it is a json object
+        **/
         for (Object playerOnServer : playersOnServer) {
             playerId = (String) ((JSONArray) playerOnServer).get(0);
             playerState = (JSONObject) ((JSONArray) playerOnServer).get(1);
@@ -35,23 +37,25 @@ public class StateHandler {
     }
 
 
-    // This maps the JSONObject values to the Hero Object values
-//    private static void mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState, Map<String, Hero> heroMap) {
+//    This maps the JSONObject values to the Hero Object values
     private static void mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState, Map<String, HeroGameEntity> heroMap) {
-        long xPos = (Long) jsonObjectState.get("xPos");
-        long yPos = (Long) jsonObjectState.get("yPos");
-        boolean isAttacking = (Boolean) jsonObjectState.get("isAttacking");
-        boolean isMoving = (Boolean) jsonObjectState.get("isMoving");
+        HeroGameEntity heroGameEntity = new HeroGameEntity();
         String direction = (String) jsonObjectState.get("facingDirection");
-        FacingDirection facingDirection = FacingDirection.NONE;
-        if (direction.equals(FacingDirection.LEFT.getDirection())) {
-           facingDirection = FacingDirection.LEFT;
-        } else if (direction.equals(FacingDirection.RIGHT.getDirection())){
-            facingDirection = FacingDirection.RIGHT;
-        }
-        heroMap.put(playerId,
-               new HeroGameEntity(
-                      xPos, yPos, 0, 0, null, 0,
-                       null, isAttacking, isMoving, facingDirection, playerId));
+        heroGameEntity.setHeroId(playerId);
+        heroGameEntity.setAttacking((Boolean) jsonObjectState.get("isAttacking"));
+        heroGameEntity.setFacingDirection(getFacingDirection(direction));
+        heroGameEntity.setXPos((Long) jsonObjectState.get("xPos"));
+        heroGameEntity.setYPos((Long) jsonObjectState.get("yPos"));
+        heroGameEntity.setMoving((Boolean) jsonObjectState.get("isMoving"));
+        heroGameEntity.setWidth(0);
+        heroGameEntity.setHeight(0);
+        heroGameEntity.setHealth(0);
+        heroMap.put(playerId, heroGameEntity);
+    }
+
+    private static FacingDirection getFacingDirection(String facingDirection) {
+       return (facingDirection.equals(FacingDirection.LEFT.getDirection()) ?
+               FacingDirection.LEFT : (facingDirection.equals(FacingDirection.RIGHT.getDirection())) ?
+               FacingDirection.RIGHT : FacingDirection.NONE);
     }
 }
