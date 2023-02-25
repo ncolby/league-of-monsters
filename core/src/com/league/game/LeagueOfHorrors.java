@@ -32,7 +32,7 @@ public class LeagueOfHorrors extends Game {
     public NetworkHandler networkHandler;
     public AssetManager assetManager;
     public Map<String, HeroGameEntity> heroes;
-    public List<AbilityEntity> abilityEntityList;
+    public Map<String, List<AbilityEntity>> abilityEntityMap;
 
     @Override
     public void create() {
@@ -40,7 +40,7 @@ public class LeagueOfHorrors extends Game {
         spriteBatch = new SpriteBatch();
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(LeagueOfHorrors.class);
         assetManager = (AssetManager) ctx.getBean("assetManager");
-//        assetManager = new AssetManager();
+        abilityEntityMap = loadAbilities(assetManager);
         heroes = new HashMap<String, HeroGameEntity>();
         networkHandler = new NetworkHandler(this);
         networkHandler.getAndConfigureSocket();
@@ -57,13 +57,14 @@ public class LeagueOfHorrors extends Game {
        assetManager.dispose();
     }
 
-    private static List<AbilityEntity> loadAbilities(AssetManager assetManager) {
-        List<AbilityEntity> abilityList = new ArrayList<AbilityEntity>();
-//        AbilityEntity ability = new AbilityEntity();
-//        assetManager.load("pumpkin_head_vines.png", Texture.class);
-//        assetManager.finishLoading();
-//        TextureRegion abilityTextureRegion = new TextureRegion(assetManager.get("pumpkin_head_vines.pgn", Texture.class));
-//        abilityList.add(ability);
-        return abilityList;
+    private static Map<String, List<AbilityEntity>> loadAbilities(AssetManager assetManager) {
+        List<AbilityEntity> abilityEntityList = new ArrayList<AbilityEntity>();
+        Map<String, List<AbilityEntity>> abilityEntityMap = new HashMap<String, List<AbilityEntity>>();
+        AbilityEntity abilityEntity = new AbilityEntity();
+        TextureRegion abilityTextureRegion = new TextureRegion(assetManager.get("pumpkin_head_vines.png", Texture.class));
+        abilityEntity.setEntityImage(abilityTextureRegion);
+        abilityEntityList.add(abilityEntity);
+        abilityEntityMap.put("pumpkin_head" , abilityEntityList);
+        return abilityEntityMap;
     }
 }

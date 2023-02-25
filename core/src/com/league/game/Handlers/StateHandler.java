@@ -47,6 +47,7 @@ public class StateHandler {
         heroGameEntity.setXPos((Long) jsonObjectState.get("xPos"));
         heroGameEntity.setYPos((Long) jsonObjectState.get("yPos"));
         heroGameEntity.setMoving((Boolean) jsonObjectState.get("isMoving"));
+        heroGameEntity.setHeroName((String) jsonObjectState.get("heroName"));
         heroGameEntity.setWidth(0);
         heroGameEntity.setHeight(0);
         heroGameEntity.setHealth(0);

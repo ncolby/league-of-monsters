@@ -15,6 +15,8 @@ public class HeroGameEntity extends LivingGameEntity {
     private boolean isAttacking = false;
     private boolean isMoving = false;
     private String heroId;
+
+    private String heroName;
     private FacingDirection facingDirection = FacingDirection.NONE;
     private List<AbilityEntity> abilities;
 }

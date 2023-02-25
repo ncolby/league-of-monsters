@@ -13,14 +13,17 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.league.game.LeagueOfHorrors;
 import com.league.game.Handlers.InputHandler;
+import com.league.game.enums.FacingDirection;
 import com.league.game.models.HeroGameEntity;
 import com.league.game.utils.ImageProcessor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+@Slf4j
 public class GameRenderScreen extends ScreenAdapter {
-
     private static final String BACKGROUND_IMAGE_NAME = "gamemap.png";
+    private TextureRegion abilityFrame;
     private LeagueOfHorrors gameManager;
     private Viewport viewport;
     private final Camera playerCamera = new OrthographicCamera();
@@ -81,18 +84,18 @@ public class GameRenderScreen extends ScreenAdapter {
                 currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
             } else if (hero.getValue().isAttacking()) {
                 currentFrame = heroAttackAnimation.getKeyFrame(animationDuration / 2, true);
-//                abilityFrame = heroAbilityAnimation.getKeyFrame(animationDuration / 2, true);
+                abilityFrame = hero.getValue().getAbilities().get(0).getEntityImage();
             } else {
                 currentFrame = heroIdleAnimation;
-//                abilityFrame = null;
+                abilityFrame = null;
             }
             hero.getValue().setEntityImage(currentFrame);
             hero.getValue().draw(gameManager.spriteBatch);
-//          if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
-//				hero.getValue().drawAbility(spriteBatch, abilityFrame, hero.getValue().getXPos() - 200, hero.getValue().getYPos());
-//			} else if ( abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.RIGHT)) {
-//				hero.getValue().drawAbility(spriteBatch, abilityFrame, hero.getValue().getXPos() + 100, hero.getValue().getYPos());
-//			}
+            if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
+                hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);
+            } else if ( abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.RIGHT)) {
+                hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);
+            }
         }
     }
 

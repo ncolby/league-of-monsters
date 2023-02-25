@@ -2,6 +2,7 @@ package com.league.game.Handlers;
 
 
 import com.league.game.LeagueOfHorrors;
+import com.league.game.models.AbilityEntity;
 import com.league.game.models.HeroGameEntity;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -11,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Getter
@@ -39,6 +43,8 @@ public class NetworkHandler {
             public void call(Object... args) {
                 HeroGameEntity heroGameEntity = new HeroGameEntity();
                 heroGameEntity.setHeroId(socket.id());
+                heroGameEntity.setHeroName("pumpkin_head");
+                heroGameEntity.setAbilities(getAbilities("pumpkin_head", gameManager.abilityEntityMap));
                 gameManager.heroes.put(socket.id(), new HeroGameEntity());
                 log.info("Connected to Game Server");
             }
@@ -58,10 +64,19 @@ public class NetworkHandler {
                     JSONObject gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
                     JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
                     gameManager.heroes = StateHandler.replicateServerState(connectedPlayers);
+                    for (HeroGameEntity hero : gameManager.heroes.values()) {
+                        hero.setAbilities(gameManager.abilityEntityMap.get("pumpkin_head"));
+                    }
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
             }
         });
+    }
+
+    private static List<AbilityEntity> getAbilities(String heroName, Map<String, List<AbilityEntity>> abilityMap) {
+        List<AbilityEntity> abilityEntitiesList = abilityMap.get(heroName);
+        System.out.println(abilityMap.get(heroName).get(0));
+        return abilityEntitiesList;
     }
 }
