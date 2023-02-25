@@ -1,7 +1,7 @@
 package com.league.game.Handlers;
 
 import com.league.game.enums.FacingDirection;
-import com.league.game.models.HeroGameEntity;
+import com.league.game.models.Entity.HeroGameEntity;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -47,6 +47,7 @@ public class StateHandler {
         heroGameEntity.setXPos((Long) jsonObjectState.get("xPos"));
         heroGameEntity.setYPos((Long) jsonObjectState.get("yPos"));
         heroGameEntity.setMoving((Boolean) jsonObjectState.get("isMoving"));
+        heroGameEntity.setHeroName((String) jsonObjectState.get("heroName"));
         heroGameEntity.setWidth(0);
         heroGameEntity.setHeight(0);
         heroGameEntity.setHealth(0);
@@ -58,4 +59,5 @@ public class StateHandler {
                FacingDirection.LEFT : (facingDirection.equals(FacingDirection.RIGHT.getDirection())) ?
                FacingDirection.RIGHT : FacingDirection.NONE);
     }
+
 }

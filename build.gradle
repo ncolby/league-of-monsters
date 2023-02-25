@@ -10,7 +10,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
-        classpath 'org.gretty:gretty:4.0.3'
+        classpath 'org.gretty:gretty-core:3.0.7'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.16'
         classpath "io.freefair.gradle:lombok-plugin:6.6.1"
     }
@@ -89,35 +89,13 @@ project(":ios") {
     }
 }
 
-project(":html") {
-    apply plugin: "java-library"
-    apply plugin: "gwt"
-    apply plugin: "war"
-    apply plugin: "org.gretty"
-    apply plugin: 'io.spring.dependency-management'
-
-
-    dependencies {
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        implementation 'org.springframework.boot:spring-boot-starter'
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
-        }
-    }
-}
-
 project(":core") {
     apply plugin: "java-library"
     apply plugin: 'io.spring.dependency-management'
 
     dependencies {
         implementation 'com.googlecode.json-simple:json-simple:1.1'
+        implementation 'com.google.code.gson:gson:2.10.1'
         implementation 'io.socket:socket.io-client:2.1.0'
         implementation 'org.springframework.boot:spring-boot-starter'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"

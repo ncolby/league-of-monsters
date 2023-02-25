@@ -1,4 +1,4 @@
-package com.league.game.models;
+package com.league.game.models.Entity;
 
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
