@@ -36,8 +36,6 @@ public class GameRenderScreen extends ScreenAdapter {
 
     public GameRenderScreen(LeagueOfHorrors gameManager) {
         this.gameManager = gameManager;
-        gameManager.assetManager.load(BACKGROUND_IMAGE_NAME, Texture.class);
-        gameManager.assetManager.finishLoading();
         backgroundTextureRegion = new TextureRegion(gameManager.assetManager.get(BACKGROUND_IMAGE_NAME, Texture.class));
         viewport = new FitViewport(gameManager.VIEW_PORT_WIDTH, gameManager.VIEW_PORT_HEIGHT, playerCamera);
     }
