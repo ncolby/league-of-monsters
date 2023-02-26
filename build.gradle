@@ -79,7 +79,6 @@ project(":ios") {
         api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        apply plugin: 'io.spring.dependency-management'
     }
 
     dependencyManagement {
@@ -120,6 +119,7 @@ project(":core") {
         implementation 'com.googlecode.json-simple:json-simple:1.1'
         implementation 'io.socket:socket.io-client:2.1.0'
         implementation 'org.springframework.boot:spring-boot-starter'
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
     }
 

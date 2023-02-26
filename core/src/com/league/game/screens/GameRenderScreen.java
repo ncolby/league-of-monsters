@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Slf4j
 public class GameRenderScreen extends ScreenAdapter {
-    private static final String BACKGROUND_IMAGE_NAME = "gamemap.png";
+    private static final String BACKGROUND_IMAGE_NAME = "background.png";
     private TextureRegion abilityFrame;
     private LeagueOfHorrors gameManager;
     private Viewport viewport;
@@ -34,7 +34,7 @@ public class GameRenderScreen extends ScreenAdapter {
     private Animation<TextureRegion> heroMovementAnimation;
     private Animation<TextureRegion> heroAttackAnimation;
     private Animation<TextureRegion> heroAbilityAnimation;
-    private TextureRegion heroIdleAnimation;
+    private Animation<TextureRegion> heroIdleAnimation;
 
 
     public GameRenderScreen(LeagueOfHorrors gameManager) {
@@ -46,10 +46,10 @@ public class GameRenderScreen extends ScreenAdapter {
     @Override
     public void show() {
         playerCamera.position.set(new Vector3(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0));
-        heroMovementAnimation = ImageProcessor.getImageAnimation("pumpkin_head_walk.png");
-        heroAttackAnimation = ImageProcessor.getImageAnimation("pumpkin_head_attack.png");
-        heroIdleAnimation = ImageProcessor.getImageStill("pumpkin_head_walk.png");
-        heroAbilityAnimation = ImageProcessor.getImageAnimation("pumpkin_head_vines.png");
+        heroMovementAnimation = ImageProcessor.getImageAnimation("pumpkin_moving.png");
+        heroAttackAnimation = ImageProcessor.getImageAnimation("pumpkin_1.png");
+        heroIdleAnimation = ImageProcessor.getImageAnimation("pumpkin_idle.png");
+        heroAbilityAnimation = ImageProcessor.getImageAnimation("pumpkin_2.png");
     }
 
     @Override
@@ -86,7 +86,7 @@ public class GameRenderScreen extends ScreenAdapter {
                 currentFrame = heroAttackAnimation.getKeyFrame(animationDuration / 2, true);
                 abilityFrame = hero.getValue().getAbilities().get(0).getEntityImage();
             } else {
-                currentFrame = heroIdleAnimation;
+                currentFrame = heroIdleAnimation.getKeyFrame(animationDuration, true);
                 abilityFrame = null;
             }
             hero.getValue().setEntityImage(currentFrame);

@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.league.game.Handlers.NetworkHandler;
 import com.league.game.models.AbilityEntity;
 import com.league.game.models.HeroGameEntity;
@@ -35,12 +36,14 @@ public class LeagueOfHorrors extends Game {
     public Map<String, List<AbilityEntity>> abilityEntityMap;
 
     @Override
+    @SuppressWarnings("unchecked")
     public void create() {
         SpringApplication.run(LeagueOfHorrors.class);
         spriteBatch = new SpriteBatch();
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(LeagueOfHorrors.class);
         assetManager = (AssetManager) ctx.getBean("assetManager");
-        abilityEntityMap = loadAbilities(assetManager);
+        abilityEntityMap = (Map<String, List<AbilityEntity>>) ctx.getBean("abilityEntityMap");
+//        abilityEntityMap = loadAbilities(assetManager);
         heroes = new HashMap<String, HeroGameEntity>();
         networkHandler = new NetworkHandler(this);
         networkHandler.getAndConfigureSocket();
@@ -57,14 +60,15 @@ public class LeagueOfHorrors extends Game {
        assetManager.dispose();
     }
 
-    private static Map<String, List<AbilityEntity>> loadAbilities(AssetManager assetManager) {
-        List<AbilityEntity> abilityEntityList = new ArrayList<AbilityEntity>();
-        Map<String, List<AbilityEntity>> abilityEntityMap = new HashMap<String, List<AbilityEntity>>();
-        AbilityEntity abilityEntity = new AbilityEntity();
-        TextureRegion abilityTextureRegion = new TextureRegion(assetManager.get("pumpkin_head_vines.png", Texture.class));
-        abilityEntity.setEntityImage(abilityTextureRegion);
-        abilityEntityList.add(abilityEntity);
-        abilityEntityMap.put("pumpkin_head" , abilityEntityList);
-        return abilityEntityMap;
-    }
+//    private static Map<String, List<AbilityEntity>> loadAbilities(AssetManager assetManager) {
+//        List<AbilityEntity> abilityEntityList = new ArrayList<AbilityEntity>();
+//        Map<String, List<AbilityEntity>> abilityEntityMap = new HashMap<String, List<AbilityEntity>>();
+//        AbilityEntity abilityEntity = new AbilityEntity();
+//        TextureRegion abilityTextureRegion = new TextureRegion(assetManager.get("pumpkin_1.png", Texture.class));
+//        abilityEntity.setEntityImage(abilityTextureRegion);
+//        abilityEntity.setAbilityName("pumpkin1");
+//        abilityEntityList.add(abilityEntity);
+//        abilityEntityMap.put("pumpkin" , abilityEntityList);
+//        return abilityEntityMap;
+//    }
 }
