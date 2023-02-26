@@ -19,7 +19,7 @@ public class GameEntity {
    private TextureRegion entityImage;
 
    public void draw(SpriteBatch spriteBatch) {
-      spriteBatch.draw(entityImage, xPos, yPos);
+       spriteBatch.draw(entityImage, xPos, yPos);
    }
 
    public boolean doEntitiesCollide(GameEntity gameEntity) {

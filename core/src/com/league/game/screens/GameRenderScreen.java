@@ -29,7 +29,6 @@ public class GameRenderScreen extends ScreenAdapter {
     private final Camera playerCamera = new OrthographicCamera();
     private TextureRegion backgroundTextureRegion;
     private float animationDuration;
-//    private TextureRegion abilityFrame;
     private TextureRegion currentFrame;
     private Animation<TextureRegion> heroMovementAnimation;
     private Animation<TextureRegion> heroAttackAnimation;

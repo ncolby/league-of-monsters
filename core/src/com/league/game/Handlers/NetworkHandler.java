@@ -48,7 +48,6 @@ public class NetworkHandler {
                     heroGameEntity.setHeroId(socket.id());
                     heroGameEntity.setHeroName("pumpkin");
                     heroGameEntity.setAbilities(getAbilities("pumpkin", gameManager.abilityEntityMap));
-                    socket.emit("createPlayer", objectMapper.writeValueAsString(heroGameEntity));
                     gameManager.heroes.put(socket.id(), new HeroGameEntity());
                     log.info("Connected to Game Server");
                 } catch (Exception e) {
@@ -67,14 +66,11 @@ public class NetworkHandler {
             @Override
             public void call(Object... args) {
                 try {
-                    ObjectMapper objectMapper = new ObjectMapper();
+//                    ObjectMapper objectMapper = new ObjectMapper();
                     JSONParser parser = new JSONParser();
                     JSONObject gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
                     JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
-                    gameManager.heroes = StateHandler.replicateServerState(connectedPlayers);
-                    for (HeroGameEntity hero : gameManager.heroes.values()) {
-                        hero.setAbilities(gameManager.abilityEntityMap.get("pumpkin"));
-                    }
+                    gameManager.heroes = StateHandler.replicateServerState(connectedPlayers, gameManager);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }

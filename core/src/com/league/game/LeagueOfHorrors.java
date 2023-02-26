@@ -2,10 +2,9 @@ package com.league.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.league.game.Handlers.NetworkHandler;
 import com.league.game.models.AbilityEntity;
 import com.league.game.models.HeroGameEntity;
@@ -32,8 +31,11 @@ public class LeagueOfHorrors extends Game {
     public SpriteBatch spriteBatch;
     public NetworkHandler networkHandler;
     public AssetManager assetManager;
+
+    public Map<String, Map<String, Animation<TextureRegion>>> animationMap;
     public Map<String, HeroGameEntity> heroes;
     public Map<String, List<AbilityEntity>> abilityEntityMap;
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -43,7 +45,7 @@ public class LeagueOfHorrors extends Game {
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(LeagueOfHorrors.class);
         assetManager = (AssetManager) ctx.getBean("assetManager");
         abilityEntityMap = (Map<String, List<AbilityEntity>>) ctx.getBean("abilityEntityMap");
-//        abilityEntityMap = loadAbilities(assetManager);
+        animationMap = (Map<String, Map<String, Animation<TextureRegion>>>) ctx.getBean("animationMap");
         heroes = new HashMap<String, HeroGameEntity>();
         networkHandler = new NetworkHandler(this);
         networkHandler.getAndConfigureSocket();
@@ -59,16 +61,4 @@ public class LeagueOfHorrors extends Game {
        spriteBatch.dispose();
        assetManager.dispose();
     }
-
-//    private static Map<String, List<AbilityEntity>> loadAbilities(AssetManager assetManager) {
-//        List<AbilityEntity> abilityEntityList = new ArrayList<AbilityEntity>();
-//        Map<String, List<AbilityEntity>> abilityEntityMap = new HashMap<String, List<AbilityEntity>>();
-//        AbilityEntity abilityEntity = new AbilityEntity();
-//        TextureRegion abilityTextureRegion = new TextureRegion(assetManager.get("pumpkin_1.png", Texture.class));
-//        abilityEntity.setEntityImage(abilityTextureRegion);
-//        abilityEntity.setAbilityName("pumpkin1");
-//        abilityEntityList.add(abilityEntity);
-//        abilityEntityMap.put("pumpkin" , abilityEntityList);
-//        return abilityEntityMap;
-//    }
 }
