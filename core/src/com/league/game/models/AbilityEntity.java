@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class AbilityEntity extends GameEntity {
+    private String abilityName;
     private long duration;
     private long cooldown;
     private long damage;

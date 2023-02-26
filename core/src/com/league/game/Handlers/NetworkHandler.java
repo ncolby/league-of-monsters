@@ -1,6 +1,7 @@
 package com.league.game.Handlers;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.league.game.LeagueOfHorrors;
 import com.league.game.models.AbilityEntity;
 import com.league.game.models.HeroGameEntity;
@@ -41,12 +42,18 @@ public class NetworkHandler {
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                HeroGameEntity heroGameEntity = new HeroGameEntity();
-                heroGameEntity.setHeroId(socket.id());
-                heroGameEntity.setHeroName("pumpkin_head");
-                heroGameEntity.setAbilities(getAbilities("pumpkin_head", gameManager.abilityEntityMap));
-                gameManager.heroes.put(socket.id(), new HeroGameEntity());
-                log.info("Connected to Game Server");
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    HeroGameEntity heroGameEntity = new HeroGameEntity();
+                    heroGameEntity.setHeroId(socket.id());
+                    heroGameEntity.setHeroName("pumpkin");
+                    heroGameEntity.setAbilities(getAbilities("pumpkin", gameManager.abilityEntityMap));
+                    socket.emit("createPlayer", objectMapper.writeValueAsString(heroGameEntity));
+                    gameManager.heroes.put(socket.id(), new HeroGameEntity());
+                    log.info("Connected to Game Server");
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
             }
         });
 
@@ -60,12 +67,13 @@ public class NetworkHandler {
             @Override
             public void call(Object... args) {
                 try {
+                    ObjectMapper objectMapper = new ObjectMapper();
                     JSONParser parser = new JSONParser();
                     JSONObject gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
                     JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
                     gameManager.heroes = StateHandler.replicateServerState(connectedPlayers);
                     for (HeroGameEntity hero : gameManager.heroes.values()) {
-                        hero.setAbilities(gameManager.abilityEntityMap.get("pumpkin_head"));
+                        hero.setAbilities(gameManager.abilityEntityMap.get("pumpkin"));
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
@@ -76,7 +84,6 @@ public class NetworkHandler {
 
     private static List<AbilityEntity> getAbilities(String heroName, Map<String, List<AbilityEntity>> abilityMap) {
         List<AbilityEntity> abilityEntitiesList = abilityMap.get(heroName);
-        System.out.println(abilityMap.get(heroName).get(0));
         return abilityEntitiesList;
     }
 }

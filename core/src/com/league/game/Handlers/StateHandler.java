@@ -41,6 +41,7 @@ public class StateHandler {
     private static void mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState, Map<String, HeroGameEntity> heroMap) {
         HeroGameEntity heroGameEntity = new HeroGameEntity();
         String direction = (String) jsonObjectState.get("facingDirection");
+        System.out.println(jsonObjectState.toJSONString());
         heroGameEntity.setHeroId(playerId);
         heroGameEntity.setAttacking((Boolean) jsonObjectState.get("isAttacking"));
         heroGameEntity.setFacingDirection(getFacingDirection(direction));
