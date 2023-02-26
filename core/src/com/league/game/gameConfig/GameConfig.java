@@ -66,6 +66,7 @@ public class GameConfig {
                 heroName = name.split("_", -2)[0];
                 Animation<TextureRegion> animation = ImageProcessor.getImageAnimation(name);
                 heroAnimations.put(name, animation);
+                System.out.println(name);
             }
             animMap.put(heroName, heroAnimations);
         }

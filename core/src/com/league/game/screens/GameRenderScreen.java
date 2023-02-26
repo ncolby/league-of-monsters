@@ -30,7 +30,6 @@ public class GameRenderScreen extends ScreenAdapter {
     private TextureRegion backgroundTextureRegion;
     private float animationDuration;
     private TextureRegion currentFrame;
-    private Animation<TextureRegion> heroMovementAnimation;
     private Animation<TextureRegion> heroAttackAnimation;
     private Animation<TextureRegion> heroAbilityAnimation;
     private Animation<TextureRegion> heroIdleAnimation;
@@ -45,7 +44,6 @@ public class GameRenderScreen extends ScreenAdapter {
     @Override
     public void show() {
         playerCamera.position.set(new Vector3(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0));
-        heroMovementAnimation = ImageProcessor.getImageAnimation("pumpkin_moving.png");
         heroAttackAnimation = ImageProcessor.getImageAnimation("pumpkin_1.png");
         heroIdleAnimation = ImageProcessor.getImageAnimation("pumpkin_idle.png");
         heroAbilityAnimation = ImageProcessor.getImageAnimation("pumpkin_2.png");
@@ -80,13 +78,16 @@ public class GameRenderScreen extends ScreenAdapter {
                 playerCamera.update();
             }
             if (hero.getValue().isMoving()) {
-                currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
+                currentFrame = gameManager.animationMap.get(hero.getValue().getHeroName()).get(hero.getValue().getHeroName() + "_moving.png").getKeyFrame(animationDuration / 2, true);
             } else if (hero.getValue().isAttacking()) {
-                currentFrame = heroAttackAnimation.getKeyFrame(animationDuration / 2, true);
-                abilityFrame = hero.getValue().getAbilities().get(0).getEntityImage();
+                currentFrame = gameManager.animationMap.get(hero.getValue().getHeroName()).get(hero.getValue().getHeroName() + "_idle.png").getKeyFrame(animationDuration / 2, true);
+//                abilityFrame = gameManager.animationMap.get(hero.getValue().getHeroName()).get(hero.getValue().getHeroName() + "_1.png").getKeyFrame(animationDuration / 2, true);
+//                currentFrame = heroAttackAnimation.getKeyFrame(animationDuration / 2, true);
+//                abilityFrame = hero.getValue().getAbilities().get(0).getEntityImage();
             } else {
-                currentFrame = heroIdleAnimation.getKeyFrame(animationDuration, true);
+                currentFrame = gameManager.animationMap.get(hero.getValue().getHeroName()).get(hero.getValue().getHeroName() + "_idle.png").getKeyFrame(animationDuration / 2, true);
                 abilityFrame = null;
+//                currentFrame = heroIdleAnimation.getKeyFrame(animationDuration, true);
             }
             hero.getValue().setEntityImage(currentFrame);
             hero.getValue().draw(gameManager.spriteBatch);
