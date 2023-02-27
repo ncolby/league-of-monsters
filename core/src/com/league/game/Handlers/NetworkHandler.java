@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +36,21 @@ public class NetworkHandler {
             configureSocket();
             socket.open();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
+//            log.error(e.getMessage());
         }
+    }
+
+    public void createHero() {
+        String heroName = gameManager.selectedHeroName;
+        if (gameManager.heroes.get(socket.id()) == null) {
+            HeroGameEntity heroGameEntity = new HeroGameEntity();
+            heroGameEntity.setHeroId(socket.id());
+            heroGameEntity.setHeroName(heroName);
+            heroGameEntity.setAbilities(getAbilities(heroName, gameManager.abilityEntityMap));
+            gameManager.heroes.put(socket.id(), new HeroGameEntity());
+        }
+        socket.emit("createHero", heroName);
     }
 
     private void configureSocket() {
@@ -43,15 +58,24 @@ public class NetworkHandler {
             @Override
             public void call(Object... args) {
                 try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    HeroGameEntity heroGameEntity = new HeroGameEntity();
-                    heroGameEntity.setHeroId(socket.id());
-                    heroGameEntity.setHeroName("pumpkin");
-                    heroGameEntity.setAbilities(getAbilities("pumpkin", gameManager.abilityEntityMap));
-                    gameManager.heroes.put(socket.id(), new HeroGameEntity());
                     log.info("Connected to Game Server");
                 } catch (Exception e) {
-                    log.error(e.getMessage());
+//                    log.error(e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        socket.on("heroCreated", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                try {
+                    if (args[0].equals(socket.id())) {
+                        gameManager.isHeroCreated = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+//                    log.error(e.getMessage());
                 }
             }
         });
@@ -66,17 +90,18 @@ public class NetworkHandler {
             @Override
             public void call(Object... args) {
                 try {
-//                    ObjectMapper objectMapper = new ObjectMapper();
                     JSONParser parser = new JSONParser();
                     JSONObject gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
                     JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
-                    gameManager.heroes = StateHandler.replicateServerState(connectedPlayers, gameManager);
+                    gameManager.heroStateQueue.add(StateHandler.replicateServerState(connectedPlayers));
                 } catch (Exception e) {
-                    log.error(e.getMessage());
+                    e.printStackTrace();
+//                    log.error(e.getMessage());
                 }
             }
         });
     }
+
 
     private static List<AbilityEntity> getAbilities(String heroName, Map<String, List<AbilityEntity>> abilityMap) {
         List<AbilityEntity> abilityEntitiesList = abilityMap.get(heroName);

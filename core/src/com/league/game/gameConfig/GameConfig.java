@@ -26,7 +26,9 @@ public class GameConfig {
         String[] assetNames = {"background.png", "pumpkin_idle.png",
                 "pumpkin_moving.png", "pumpkin_1.png",
                 "pumpkin_2.png", "reaper_1.png",
-                "reaper_2.png", "reaper_moving.png", "reaper_idle.png"};
+                "reaper_2.png", "reaper_moving.png", "reaper_idle.png",
+                "reaper_selection.png", "pumpkin_selection.png", "loading.png"
+        };
         for (String assets : assetNames) {
             assetManager.load(assets, Texture.class);
         }

@@ -6,6 +6,7 @@ import com.league.game.models.AbilityEntity;
 import com.league.game.models.HeroGameEntity;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public class StateHandler {
      * This is because we can't serialize node objects to become Java Maps, it would be easier if the server were Java
      * That way we can just send the object over and not need to copy anything
      * **/
-    public static Map<String, HeroGameEntity> replicateServerState(JSONArray playersOnServer, LeagueOfHorrors gameManager) {
+    public static Map<String, HeroGameEntity> replicateServerState(JSONArray playersOnServer) {
         JSONObject playerState;
         String playerId;
         Map<String, HeroGameEntity> newPlayersOnClient = new HashMap<String, HeroGameEntity>();
@@ -35,14 +36,14 @@ public class StateHandler {
         for (Object playerOnServer : playersOnServer) {
             playerId = (String) ((JSONArray) playerOnServer).get(0);
             playerState = (JSONObject) ((JSONArray) playerOnServer).get(1);
-            mapJSONHeroStateToHeroObject(playerId, playerState, newPlayersOnClient, gameManager);
+            newPlayersOnClient.put(playerId, mapJSONHeroStateToHeroObject(playerId, playerState));
         }
         return newPlayersOnClient;
     }
 
 
 //    This maps the JSONObject values to the Hero Object values
-    private static void mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState, Map<String, HeroGameEntity> heroMap, LeagueOfHorrors gameManager) {
+    private static HeroGameEntity mapJSONHeroStateToHeroObject (String playerId, JSONObject jsonObjectState) {
         String direction = (String) jsonObjectState.get("facingDirection");
         HeroGameEntity heroGameEntity = new HeroGameEntity();
         heroGameEntity.setHeroId(playerId);
@@ -50,13 +51,13 @@ public class StateHandler {
         heroGameEntity.setWidth(0);
         heroGameEntity.setHeight(0);
         heroGameEntity.setHealth(0);
-        mapAbilityToHero(heroGameEntity, gameManager, (JSONArray) jsonObjectState.get("abilities"));
+        heroGameEntity.setAbilities(mapAbilityToHero((JSONArray) jsonObjectState.get("abilities")));
         heroGameEntity.setAttacking((Boolean) jsonObjectState.get("isAttacking"));
         heroGameEntity.setFacingDirection(getFacingDirection(direction));
         heroGameEntity.setXPos((Long) jsonObjectState.get("xPos"));
         heroGameEntity.setYPos((Long) jsonObjectState.get("yPos"));
         heroGameEntity.setMoving((Boolean) jsonObjectState.get("isMoving"));
-        heroMap.put(playerId, heroGameEntity);
+        return heroGameEntity;
     }
 
     private static FacingDirection getFacingDirection(String facingDirection) {
@@ -65,15 +66,13 @@ public class StateHandler {
                FacingDirection.RIGHT : FacingDirection.NONE);
     }
 
-    private static void mapAbilityToHero(HeroGameEntity heroGameEntity, LeagueOfHorrors gameManager, JSONArray jsonStateArray) {
+    private static List<AbilityEntity> mapAbilityToHero(JSONArray jsonStateArray) {
         List<AbilityEntity> abilityEntities = new ArrayList<>();
-        List<AbilityEntity> abilityEntitiesContainingImageName = gameManager.abilityEntityMap.get(heroGameEntity.getHeroName());
         JSONObject jsonAbilityObject;
-        int count = 0;
-        for (AbilityEntity abilityEntityContainingImageName :  abilityEntitiesContainingImageName) {
-            jsonAbilityObject = (JSONObject) jsonStateArray.get(count);
+        for (int i = 0; i < jsonStateArray.size(); i++) {
+            jsonAbilityObject = (JSONObject) jsonStateArray.get(i);
             AbilityEntity abilityEntity = new AbilityEntity();
-            abilityEntity.setAbilityName(abilityEntityContainingImageName.getAbilityName());
+            abilityEntity.setAbilityName((String) jsonAbilityObject.get("abilityName"));
             abilityEntity.setXPos((long) jsonAbilityObject.get("xPos"));
             abilityEntity.setYPos((long) jsonAbilityObject.get("yPos"));
             abilityEntity.setWidth((long) jsonAbilityObject.get("width"));
@@ -81,6 +80,6 @@ public class StateHandler {
             abilityEntity.setDamage((long) jsonAbilityObject.get("damage"));
             abilityEntities.add(abilityEntity);
         }
-        heroGameEntity.setAbilities(abilityEntities);
+        return abilityEntities;
     }
 }
