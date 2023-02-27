@@ -15,26 +15,24 @@ import com.league.game.LeagueOfHorrors;
 import com.league.game.Handlers.InputHandler;
 import com.league.game.enums.FacingDirection;
 import com.league.game.models.HeroGameEntity;
-import com.league.game.utils.ImageProcessor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 public class GameRenderScreen extends ScreenAdapter {
     private static final String BACKGROUND_IMAGE_NAME = "background.png";
+    private static final String ABILITY_ONE_SUFFIX = "_1.png";
+    private static final String IDLE_SUFFIX= "_idle.png";
+    private static final String MOVING_SUFFIX= "_moving.png";
     private TextureRegion abilityFrame;
-    private LeagueOfHorrors gameManager;
-    private Viewport viewport;
+    private final LeagueOfHorrors gameManager;
+    private final Viewport viewport;
     private final Camera playerCamera = new OrthographicCamera();
-    private TextureRegion backgroundTextureRegion;
+    private final TextureRegion backgroundTextureRegion;
     private float animationDuration;
-//    private TextureRegion abilityFrame;
-    private TextureRegion currentFrame;
-    private Animation<TextureRegion> heroMovementAnimation;
-    private Animation<TextureRegion> heroAttackAnimation;
-    private Animation<TextureRegion> heroAbilityAnimation;
-    private Animation<TextureRegion> heroIdleAnimation;
 
 
     public GameRenderScreen(LeagueOfHorrors gameManager) {
@@ -46,10 +44,6 @@ public class GameRenderScreen extends ScreenAdapter {
     @Override
     public void show() {
         playerCamera.position.set(new Vector3(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0));
-        heroMovementAnimation = ImageProcessor.getImageAnimation("pumpkin_moving.png");
-        heroAttackAnimation = ImageProcessor.getImageAnimation("pumpkin_1.png");
-        heroIdleAnimation = ImageProcessor.getImageAnimation("pumpkin_idle.png");
-        heroAbilityAnimation = ImageProcessor.getImageAnimation("pumpkin_2.png");
     }
 
     @Override
@@ -75,27 +69,38 @@ public class GameRenderScreen extends ScreenAdapter {
 
     private void renderHeroes() {
         animationDuration += Gdx.graphics.getDeltaTime();
+        String heroName = "";
         for (Map.Entry<String, HeroGameEntity> hero : gameManager.heroes.entrySet()) {
-            if (hero.getKey().equals(gameManager.networkHandler.getSocket().id())) {
-                playerCamera.position.x = hero.getValue().getXPos();
-                playerCamera.update();
+            heroName = hero.getValue().getHeroName();
+            try {
+                if (hero.getKey().equals(gameManager.networkHandler.getSocket().id())) {
+                    playerCamera.position.x = hero.getValue().getXPos();
+                    playerCamera.update();
+                }
+                TextureRegion currentFrame;
+                if (hero.getValue().isMoving()) {
+                    currentFrame = gameManager.animationMap.get(heroName).get(heroName + MOVING_SUFFIX).getKeyFrame(animationDuration/2, true);
+                } else if (hero.getValue().isAttacking()) {
+                    currentFrame = gameManager.animationMap.get(heroName).get(heroName + IDLE_SUFFIX).getKeyFrame(animationDuration/2, true);
+                    abilityFrame = gameManager.animationMap.get(heroName).get(heroName + ABILITY_ONE_SUFFIX).getKeyFrame(animationDuration/2, true);
+                } else {
+                    currentFrame = gameManager.animationMap.get(heroName).get(heroName + IDLE_SUFFIX).getKeyFrame(animationDuration/2, true);
+                    abilityFrame = null;
+                }
+
+                hero.getValue().setEntityImage(currentFrame);
+                hero.getValue().draw(gameManager.spriteBatch);
+                if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
+                    hero.getValue().getAbilities().get(0).setEntityImage(abilityFrame);
+                    hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);
+                } else if ( abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.RIGHT)) {
+                    hero.getValue().getAbilities().get(0).setEntityImage(abilityFrame);
+                    hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
-            if (hero.getValue().isMoving()) {
-                currentFrame = heroMovementAnimation.getKeyFrame(animationDuration, true);
-            } else if (hero.getValue().isAttacking()) {
-                currentFrame = heroAttackAnimation.getKeyFrame(animationDuration / 2, true);
-                abilityFrame = hero.getValue().getAbilities().get(0).getEntityImage();
-            } else {
-                currentFrame = heroIdleAnimation.getKeyFrame(animationDuration, true);
-                abilityFrame = null;
-            }
-            hero.getValue().setEntityImage(currentFrame);
-            hero.getValue().draw(gameManager.spriteBatch);
-            if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
-                hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);
-            } else if ( abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.RIGHT)) {
-                hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);
-            }
+
         }
     }
 

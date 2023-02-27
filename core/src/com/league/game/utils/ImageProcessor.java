@@ -1,33 +1,30 @@
 package com.league.game.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @NoArgsConstructor
+@Component
 @Data
 public class ImageProcessor {
-    public static Animation<TextureRegion> getImageAnimation(String pathToImage) {
-        return (new Animation<TextureRegion>(0.15f, getTextureRegion(pathToImage)));
+    public static Animation<TextureRegion> getImageAnimation(String pathToImage, AssetManager assetManager) {
+        return (new Animation<TextureRegion>(0.15f, getTextureRegion(pathToImage, assetManager)));
     }
 
-    public static TextureRegion getImageStill(String pathToImage) {
-        return getTextureRegion(pathToImage)[4];
-    }
-
-    // TODO: handle garbage cleanup of the TextureRegion, use dispose
-    private static TextureRegion[] getTextureRegion(String pathToImage) {
+    private static TextureRegion[] getTextureRegion(String pathToImage, AssetManager assetManager) {
         TextureRegion[] movementFrames;
         int spriteCols = 4;
         int spriteRows = 2;
         int frameCount = 0;
-        Texture movementSpriteSheet = new Texture(Gdx.files.internal(pathToImage));
         TextureRegion[][] movementSpriteSheetSplits = TextureRegion.
-                split(movementSpriteSheet, movementSpriteSheet.getWidth() / spriteCols
-                        , movementSpriteSheet.getHeight() / spriteRows);
+                split(assetManager.get(pathToImage, Texture.class), assetManager.get(pathToImage, Texture.class).getWidth() / spriteCols
+                        , assetManager.get(pathToImage, Texture.class).getHeight() / spriteRows);
         movementFrames = new TextureRegion[spriteCols * spriteRows];
         for (int i = 0; i < spriteRows; i++) {
             for (int j = 0; j < spriteCols; j++) {
