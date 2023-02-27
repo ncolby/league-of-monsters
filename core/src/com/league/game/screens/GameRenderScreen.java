@@ -30,7 +30,6 @@ public class GameRenderScreen extends ScreenAdapter {
     private static final String IDLE_SUFFIX= "_idle.png";
     private static final String MOVING_SUFFIX= "_moving.png";
 
-    private int MAX_STATE_QUEUE_SIZE = 5;
     private TextureRegion abilityFrame;
     private final LeagueOfHorrors gameManager;
     private final Viewport viewport;
@@ -56,9 +55,7 @@ public class GameRenderScreen extends ScreenAdapter {
         ScreenUtils.clear(0, 0, 0, 0);
         gameManager.spriteBatch.setProjectionMatrix(playerCamera.combined);
         InputHandler.handleInput(gameManager.networkHandler.getSocket());
-        if (gameManager.heroStateQueue.size() <= MAX_STATE_QUEUE_SIZE) {
-            gameManager.networkHandler.getSocket().emit("getState");
-        }
+        gameManager.networkHandler.getSocket().emit("getState");
         gameManager.getSpriteBatch().begin();
         gameManager.getSpriteBatch().draw(backgroundTextureRegion, 0, 0);
         renderHeroes();
@@ -88,15 +85,11 @@ public class GameRenderScreen extends ScreenAdapter {
                     }
                     TextureRegion currentFrame;
                     if (hero.getValue().isMoving()) {
-//                        currentFrame = ImageProcessor.getImageAnimation(heroName + MOVING_SUFFIX, gameManager.assetManager).getKeyFrame(animationDuration/2, true);
                         currentFrame = gameManager.animationMap.get(heroName).get(heroName + MOVING_SUFFIX).getKeyFrame(animationDuration/2, true);
                     } else if (hero.getValue().isAttacking()) {
-//                        currentFrame = ImageProcessor.getImageAnimation(heroName + IDLE_SUFFIX, gameManager.assetManager).getKeyFrame(animationDuration/2, true);
-//                        abilityFrame = ImageProcessor.getImageAnimation(heroName + ABILITY_ONE_SUFFIX, gameManager.assetManager).getKeyFrame(animationDuration/2, true);
                         currentFrame = gameManager.animationMap.get(heroName).get(heroName + IDLE_SUFFIX).getKeyFrame(animationDuration/2, true);
                         abilityFrame = gameManager.animationMap.get(heroName).get(heroName + ABILITY_ONE_SUFFIX).getKeyFrame(animationDuration/2, true);
                     } else {
-//                        currentFrame = ImageProcessor.getImageAnimation(heroName + IDLE_SUFFIX, gameManager.assetManager).getKeyFrame(animationDuration/2, true);
                         currentFrame = gameManager.animationMap.get(heroName).get(heroName + IDLE_SUFFIX).getKeyFrame(animationDuration/2, true);
                         abilityFrame = null;
                     }
