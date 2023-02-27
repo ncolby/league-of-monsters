@@ -26,6 +26,8 @@ public class NetworkHandler {
     private LeagueOfHorrors gameManager;
     private Socket socket;
 
+    private int MAX_STATE_QUEUE_SIZE = 1;
+
     public NetworkHandler (LeagueOfHorrors gameManager) {
        this.gameManager = gameManager;
     }
@@ -93,7 +95,9 @@ public class NetworkHandler {
                     JSONParser parser = new JSONParser();
                     JSONObject gameState = (JSONObject) parser.parse(String.valueOf(args[0]));
                     JSONArray connectedPlayers = (JSONArray) gameState.get("connected");
-                    gameManager.heroStateQueue.add(StateHandler.replicateServerState(connectedPlayers));
+                    if (gameManager.heroStateQueue.size() < MAX_STATE_QUEUE_SIZE) {
+                        gameManager.heroStateQueue.add(StateHandler.replicateServerState(connectedPlayers));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
 //                    log.error(e.getMessage());
