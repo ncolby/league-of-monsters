@@ -48,9 +48,9 @@ public class StateHandler {
         HeroGameEntity heroGameEntity = new HeroGameEntity();
         heroGameEntity.setHeroId(playerId);
         heroGameEntity.setHeroName((String) jsonObjectState.get("heroName"));
-        heroGameEntity.setWidth(0);
-        heroGameEntity.setHeight(0);
-        heroGameEntity.setHealth(0);
+        heroGameEntity.setWidth((long) jsonObjectState.get("width"));
+        heroGameEntity.setHeight((long) jsonObjectState.get("height"));
+        heroGameEntity.setHealth((long) jsonObjectState.get("health"));
         heroGameEntity.setAbilities(mapAbilityToHero((JSONArray) jsonObjectState.get("abilities")));
         heroGameEntity.setAttacking((Boolean) jsonObjectState.get("isAttacking"));
         heroGameEntity.setFacingDirection(getFacingDirection(direction));

@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -27,8 +29,9 @@ import java.util.Map;
 public class GameRenderScreen extends ScreenAdapter {
     private static final String BACKGROUND_IMAGE_NAME = "background.png";
     private static final String ABILITY_ONE_SUFFIX = "_1.png";
-    private static final String IDLE_SUFFIX= "_idle.png";
-    private static final String MOVING_SUFFIX= "_moving.png";
+    private static final String IDLE_SUFFIX = "_idle.png";
+    private static final String MOVING_SUFFIX = "_moving.png";
+    private static final String HEALTH_BAR_NAME = "health.png";
 
     private TextureRegion abilityFrame;
     private final LeagueOfHorrors gameManager;
@@ -36,6 +39,8 @@ public class GameRenderScreen extends ScreenAdapter {
     private final Camera playerCamera = new OrthographicCamera();
     private final TextureRegion backgroundTextureRegion;
     private float animationDuration;
+
+    private BitmapFont font;
 
 
 
@@ -94,7 +99,11 @@ public class GameRenderScreen extends ScreenAdapter {
                         abilityFrame = null;
                     }
                     hero.getValue().setEntityImage(currentFrame);
+                    if (hero.getValue().getHealthBarImage() == null) {
+                        hero.getValue().setHealthBarImage(ImageProcessor.getImageStill(HEALTH_BAR_NAME, gameManager.assetManager));
+                    }
                     hero.getValue().draw(gameManager.spriteBatch);
+
                     if (abilityFrame != null && hero.getValue().getFacingDirection().equals(FacingDirection.LEFT)) {
                         hero.getValue().getAbilities().get(0).setEntityImage(abilityFrame);
                         hero.getValue().getAbilities().get(0).draw(gameManager.spriteBatch);

@@ -3,6 +3,7 @@ package com.league.game.gameConfig;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.league.game.models.AbilityEntity;
 import com.league.game.utils.ImageProcessor;
@@ -27,7 +28,7 @@ public class GameConfig {
                 "pumpkin_moving.png", "pumpkin_1.png",
                 "pumpkin_2.png", "reaper_1.png",
                 "reaper_2.png", "reaper_moving.png", "reaper_idle.png",
-                "reaper_selection.png", "pumpkin_selection.png", "loading.png"
+                "reaper_selection.png", "pumpkin_selection.png", "loading.png", "health.png"
         };
         for (String assets : assetNames) {
             assetManager.load(assets, Texture.class);

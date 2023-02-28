@@ -17,6 +17,10 @@ public class ImageProcessor {
         return (new Animation<TextureRegion>(0.15f, getTextureRegion(pathToImage, assetManager)));
     }
 
+    public static TextureRegion getImageStill(String pathToImage, AssetManager assetManager) {
+       return (new TextureRegion(assetManager.get(pathToImage, Texture.class)));
+    }
+
     private static TextureRegion[] getTextureRegion(String pathToImage, AssetManager assetManager) {
         TextureRegion[] movementFrames;
         int spriteCols = 4;

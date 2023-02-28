@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -19,21 +18,6 @@ public class GameEntity {
    private TextureRegion entityImage;
 
    public void draw(SpriteBatch spriteBatch) {
-       spriteBatch.draw(entityImage, xPos, yPos);
+      spriteBatch.draw(this.getEntityImage(), this.getXPos(), this.getYPos(), this.getWidth(), this.getHeight());
    }
-
-   public boolean doEntitiesCollide(GameEntity gameEntity) {
-       long otherGameEntityBegin = gameEntity.getXPos();
-       long otherGameEntityEnd = gameEntity.getXPos() + gameEntity.getWidth();
-       long thisGameEntityBegin = xPos;
-       long thisGameEntityEnd = xPos + width;
-       if ((thisGameEntityBegin >= otherGameEntityBegin && thisGameEntityBegin <= otherGameEntityEnd) || (
-               thisGameEntityEnd >= otherGameEntityBegin && thisGameEntityEnd <= otherGameEntityEnd
-               )) {
-           return true;
-       } else {
-           return false;
-       }
-   }
-
 }
