@@ -34,6 +34,7 @@ public class LeagueOfHorrors extends Game {
     public NetworkHandler networkHandler;
     public AssetManager assetManager;
     public Boolean isHeroCreated = false;
+    public String playerId;
     public String selectedHeroName;
 
     public LinkedList<Map<String, HeroGameEntity>> heroStateQueue;
@@ -48,18 +49,20 @@ public class LeagueOfHorrors extends Game {
     @SuppressWarnings("unchecked")
     public void create() {
         SpringApplication.run(LeagueOfHorrors.class);
+        playerId = UUID.randomUUID().toString();
         udpNetworkHandler = new UDPNetworkHandler();
+        heroStateQueue = new LinkedList<Map<String, HeroGameEntity>>();
+        spriteBatch = new SpriteBatch();
+		ApplicationContext ctx = new AnnotationConfigApplicationContext(LeagueOfHorrors.class);
+        assetManager = (AssetManager) ctx.getBean("assetManager");
+        abilityEntityMap = (Map<String, List<AbilityEntity>>) ctx.getBean("abilityEntityMap");
+        animationMap = (Map<String, Map<String, Animation<TextureRegion>>>) ctx.getBean("animationMap");
+        heroes = new HashMap<String, HeroGameEntity>();
         if (udpNetworkHandler.getClientSocket() != null) {
-            setScreen(new DummyScreen(this));
+            setScreen(new HeroSelectionScreen(this));
+//            setScreen(new DummyScreen(this));
         }
-//        udpNetworkHandler.playGame();
-//        heroStateQueue = new LinkedList<>();
-//        spriteBatch = new SpriteBatch();
-//		ApplicationContext ctx = new AnnotationConfigApplicationContext(LeagueOfHorrors.class);
-//        assetManager = (AssetManager) ctx.getBean("assetManager");
-//        abilityEntityMap = (Map<String, List<AbilityEntity>>) ctx.getBean("abilityEntityMap");
-//        animationMap = (Map<String, Map<String, Animation<TextureRegion>>>) ctx.getBean("animationMap");
-//        heroes = new HashMap<String, HeroGameEntity>();
+
 //        networkHandler = new NetworkHandler(this);
 //        networkHandler.getAndConfigureSocket();
 //        if (networkHandler.getSocket() != null) {

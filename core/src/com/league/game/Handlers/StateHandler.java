@@ -48,9 +48,9 @@ public class StateHandler {
         HeroGameEntity heroGameEntity = new HeroGameEntity();
         heroGameEntity.setHeroId(playerId);
         heroGameEntity.setHeroName((String) jsonObjectState.get("heroName"));
-        heroGameEntity.setWidth((long) jsonObjectState.get("width"));
-        heroGameEntity.setHeight((long) jsonObjectState.get("height"));
-        heroGameEntity.setHealth((long) jsonObjectState.get("health"));
+//        heroGameEntity.setWidth((long) jsonObjectState.get("width"));
+//        heroGameEntity.setHeight((long) jsonObjectState.get("height"));
+//        heroGameEntity.setHealth((long) jsonObjectState.get("health"));
         heroGameEntity.setAbilities(mapAbilityToHero((JSONArray) jsonObjectState.get("abilities")));
         heroGameEntity.setAttacking((Boolean) jsonObjectState.get("isAttacking"));
         heroGameEntity.setFacingDirection(getFacingDirection(direction));
@@ -67,17 +67,17 @@ public class StateHandler {
     }
 
     private static List<AbilityEntity> mapAbilityToHero(JSONArray jsonStateArray) {
-        List<AbilityEntity> abilityEntities = new ArrayList<>();
+        List<AbilityEntity> abilityEntities = new ArrayList<AbilityEntity>();
         JSONObject jsonAbilityObject;
         for (int i = 0; i < jsonStateArray.size(); i++) {
             jsonAbilityObject = (JSONObject) jsonStateArray.get(i);
             AbilityEntity abilityEntity = new AbilityEntity();
             abilityEntity.setAbilityName((String) jsonAbilityObject.get("abilityName"));
-            abilityEntity.setXPos((long) jsonAbilityObject.get("xPos"));
-            abilityEntity.setYPos((long) jsonAbilityObject.get("yPos"));
-            abilityEntity.setWidth((long) jsonAbilityObject.get("width"));
-            abilityEntity.setHeight((long) jsonAbilityObject.get("height"));
-            abilityEntity.setDamage((long) jsonAbilityObject.get("damage"));
+//            abilityEntity.setXPos((long) jsonAbilityObject.get("xPos"));
+//            abilityEntity.setYPos((long) jsonAbilityObject.get("yPos"));
+//            abilityEntity.setWidth((long) jsonAbilityObject.get("width"));
+//            abilityEntity.setHeight((long) jsonAbilityObject.get("height"));
+//            abilityEntity.setDamage((long) jsonAbilityObject.get("damage"));
             abilityEntities.add(abilityEntity);
         }
         return abilityEntities;

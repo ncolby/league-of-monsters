@@ -4,6 +4,10 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.league.game.Handlers.UDPCreationHandler;
 import com.league.game.Handlers.UDPInputHandler;
 import com.league.game.LeagueOfHorrors;
+import org.json.simple.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DummyScreen extends ScreenAdapter {
 
@@ -15,12 +19,15 @@ public class DummyScreen extends ScreenAdapter {
 
     @Override
     public void show(){
-        UDPCreationHandler.handleCreation(gameManager.udpNetworkHandler);
+        UDPCreationHandler.handleCreation(gameManager);
     }
 
     @Override
     public void render(float delta) {
-        UDPInputHandler.handleInput(gameManager.udpNetworkHandler);
+        UDPInputHandler.handleInput(gameManager);
+        Map<String, String> command = new HashMap<String, String>();
+        command.put("getUpdate", gameManager.getPlayerId());
+        gameManager.udpNetworkHandler.sendData(JSONObject.toJSONString(command));
     }
 
     @Override

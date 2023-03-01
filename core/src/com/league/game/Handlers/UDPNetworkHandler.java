@@ -22,7 +22,6 @@ public class UDPNetworkHandler {
     public static final int SERVER_PORT = 8086;
    public UDPNetworkHandler() {
        try{
-//           clientSocket = new DatagramSocket(CLIENT_PORT) ;
            clientSocket = new DatagramSocket() ;
            clientIpAddress = InetAddress.getByName("127.0.0.1");
            serverIpAddress = InetAddress.getByName("127.0.0.1");
@@ -30,22 +29,6 @@ public class UDPNetworkHandler {
                    serverIpAddress, SERVER_PORT);
        } catch (Exception e) {
             e.printStackTrace();
-       }
-   }
-
-   public void playGame() {
-       Scanner scanner = new Scanner(System.in);
-       String message;
-       while (true) {
-           outgoingDatagramPacketBuffer = scanner.nextLine().getBytes();
-           try {
-               clientSocket.send(new DatagramPacket(outgoingDatagramPacketBuffer, outgoingDatagramPacketBuffer.length, serverIpAddress, SERVER_PORT));
-               clientSocket.receive(incomingDatagramPacket);
-               message = new String(incomingDatagramPacket.getData(), 0, incomingDatagramPacket.getLength());
-               System.out.println(message);
-           } catch (Exception e) {
-              e.printStackTrace();
-           }
        }
    }
 

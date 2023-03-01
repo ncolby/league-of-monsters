@@ -1,5 +1,6 @@
 package com.league.game.Handlers;
 
+import com.league.game.LeagueOfHorrors;
 import com.serializers.SerializableAbilityEntity;
 import com.serializers.SerializableGameState;
 import com.serializers.SerializableHeroEntity;
@@ -27,16 +28,16 @@ public class UDPCreationHandler {
 
     public static final int SERVER_PORT = 8086;
 
-    public static void handleCreation(UDPNetworkHandler udpNetworkHandler) {
-        playerId = UUID.randomUUID().toString();
+    public static void handleCreation(LeagueOfHorrors gameManager) {
+        playerId = gameManager.getPlayerId();
         incomingDatagramPacketBuffer = new byte[1024];
         outgoingDatagramPacketBuffer = new byte[1024];
         incomingDatagramPacket = new DatagramPacket(incomingDatagramPacketBuffer, incomingDatagramPacketBuffer.length);
         creationCommand = new HashMap<String, String>();
-//        creationCommand.put("createHero", "pumpkin");
-        creationCommand.put("test", "pumpkin_" + playerId);
+        creationCommand.put("createHero", "pumpkin_" + playerId);
         outgoingDatagramPacketBuffer = JSONObject.toJSONString(creationCommand).getBytes();
         try {
+            gameManager.udpNetworkHandler.getClientSocket().setSoTimeout(5000);
             outgoingDatagramPacket = new DatagramPacket(outgoingDatagramPacketBuffer, outgoingDatagramPacketBuffer.length,
                     InetAddress.getByName("127.0.0.1"), SERVER_PORT);
         } catch (Exception e) {
@@ -44,36 +45,27 @@ public class UDPCreationHandler {
         }
         while (true) {
             try {
-                udpNetworkHandler.getClientSocket().send(outgoingDatagramPacket);
-                udpNetworkHandler.getClientSocket().receive(incomingDatagramPacket);
-                SerializableAbilityEntity serializableAbilityEntity = null;
-                SerializableHeroEntity serializableHeroEntity = null;
+                gameManager.udpNetworkHandler.getClientSocket().send(outgoingDatagramPacket);
+                gameManager.udpNetworkHandler.getClientSocket().receive(incomingDatagramPacket);
                 SerializableGameState serializableGameState = null;
-                SerializedHero serializedHero = null;
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(incomingDatagramPacket.getData());
                 ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
                 Object object = objectInputStream.readObject();
-                objectInputStream.close();
-                if (object instanceof SerializableAbilityEntity) {
-                    serializableAbilityEntity = (SerializableAbilityEntity) object;
-                } else if (object instanceof SerializedHero) {
-                    serializedHero = (SerializedHero) object;
-                } else if (object instanceof SerializableHeroEntity) {
-                    serializableHeroEntity = (SerializableHeroEntity) object;
-                } else if (object instanceof SerializableGameState) {
+                if (object instanceof SerializableGameState) {
                     serializableGameState = (SerializableGameState) object;
                 }
-                if (serializedHero != null) {
-                    System.out.println(serializedHero.getName() + " is " + serializedHero.getAge());
-                } else if (serializableAbilityEntity != null) {
-                    System.out.println(serializableAbilityEntity.getAbilityName() + " cooldown is " + serializableAbilityEntity.getCooldownEnd());
-                } else if (serializableHeroEntity != null) {
-                    System.out.println(serializableHeroEntity.getHeroName() + " has an ability of : " + serializableHeroEntity.getAbilities().get(0).getAbilityName());
-                } else if (serializableGameState != null) {
-                    System.out.println(serializableGameState.getConnectedPlayers().get(playerId).getHeroName() + " is the first hero with ability " +
-                            serializableGameState.getConnectedPlayers().get(playerId).getAbilities().get(0).getAbilityName());
+                objectInputStream.close();
+                if (serializableGameState != null) {
+                    System.out.println(serializableGameState.toString());
+                    if (serializableGameState.getConnectedPlayers().get(playerId) != null) {
+                        gameManager.isHeroCreated = true;
+                        break;
+                    }
                 }
             } catch (SocketTimeoutException e) {
+                System.out.println("timeout");
+            } catch (EOFException e) {
+                System.out.println(e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {

@@ -14,6 +14,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.league.game.Handlers.StateHandler;
+import com.league.game.Handlers.UDPInputHandler;
+import com.league.game.Handlers.UDPUpdateHandler;
 import com.league.game.LeagueOfHorrors;
 import com.league.game.Handlers.InputHandler;
 import com.league.game.enums.FacingDirection;
@@ -53,14 +56,18 @@ public class GameRenderScreen extends ScreenAdapter {
     @Override
     public void show() {
         playerCamera.position.set(new Vector3(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0));
+
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 0);
         gameManager.spriteBatch.setProjectionMatrix(playerCamera.combined);
-        InputHandler.handleInput(gameManager.networkHandler.getSocket());
-        gameManager.networkHandler.getSocket().emit("getState");
+        UDPInputHandler.handleInput(gameManager);
+        Map<String, String> command = new HashMap<String, String>();
+        command.put("getUpdate", gameManager.getPlayerId());
+        gameManager.udpNetworkHandler.sendData(JSONObject.toJSONString(command));
+        UDPUpdateHandler.handleUpdate(gameManager);
         gameManager.getSpriteBatch().begin();
         gameManager.getSpriteBatch().draw(backgroundTextureRegion, 0, 0);
         renderHeroes();
@@ -84,7 +91,7 @@ public class GameRenderScreen extends ScreenAdapter {
             for (Map.Entry<String, HeroGameEntity> hero : localHeroGameState.entrySet()) {
                 heroName = hero.getValue().getHeroName();
                 try {
-                    if (hero.getKey().equals(gameManager.networkHandler.getSocket().id())) {
+                    if (hero.getKey().equals(gameManager.playerId)) {
                         playerCamera.position.x = hero.getValue().getXPos();
                         playerCamera.update();
                     }
