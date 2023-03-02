@@ -16,8 +16,8 @@ public class UDPNetworkHandler {
     private InetAddress clientIpAddress;
 
     private InetAddress serverIpAddress;
-    private byte[] incomingDatagramPacketBuffer = new byte[1024];
-    private byte[] outgoingDatagramPacketBuffer = new byte[1024];
+    private byte[] incomingDatagramPacketBuffer = new byte[16000];
+    private byte[] outgoingDatagramPacketBuffer = new byte[16000];
     public static final int CLIENT_PORT = 8085;
     public static final int SERVER_PORT = 8086;
    public UDPNetworkHandler() {

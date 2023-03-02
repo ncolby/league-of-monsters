@@ -60,16 +60,7 @@ public class LeagueOfHorrors extends Game {
         heroes = new HashMap<String, HeroGameEntity>();
         if (udpNetworkHandler.getClientSocket() != null) {
             setScreen(new HeroSelectionScreen(this));
-//            setScreen(new DummyScreen(this));
         }
-
-//        networkHandler = new NetworkHandler(this);
-//        networkHandler.getAndConfigureSocket();
-//        if (networkHandler.getSocket() != null) {
-//            setScreen(new HeroSelectionScreen(this));
-//        } else {
-//            log.error("Enable to create a socket.");
-//        }
     }
 
     @Override

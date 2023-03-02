@@ -14,6 +14,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 public class UDPCreationHandler {
 
@@ -30,11 +31,11 @@ public class UDPCreationHandler {
 
     public static void handleCreation(LeagueOfHorrors gameManager) {
         playerId = gameManager.getPlayerId();
-        incomingDatagramPacketBuffer = new byte[1024];
-        outgoingDatagramPacketBuffer = new byte[1024];
+        incomingDatagramPacketBuffer = new byte[16000];
+        outgoingDatagramPacketBuffer = new byte[16000];
         incomingDatagramPacket = new DatagramPacket(incomingDatagramPacketBuffer, incomingDatagramPacketBuffer.length);
         creationCommand = new HashMap<String, String>();
-        creationCommand.put("createHero", "pumpkin_" + playerId);
+        creationCommand.put("createHero", gameManager.getSelectedHeroName() + "_" + playerId);
         outgoingDatagramPacketBuffer = JSONObject.toJSONString(creationCommand).getBytes();
         try {
             gameManager.udpNetworkHandler.getClientSocket().setSoTimeout(5000);
@@ -43,34 +44,38 @@ public class UDPCreationHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        while (true) {
+//        while (true) {
             try {
                 gameManager.udpNetworkHandler.getClientSocket().send(outgoingDatagramPacket);
                 gameManager.udpNetworkHandler.getClientSocket().receive(incomingDatagramPacket);
                 SerializableGameState serializableGameState = null;
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(incomingDatagramPacket.getData());
+
                 ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
                 Object object = objectInputStream.readObject();
                 if (object instanceof SerializableGameState) {
                     serializableGameState = (SerializableGameState) object;
                 }
                 objectInputStream.close();
+
+                byteArrayInputStream.close();
+
                 if (serializableGameState != null) {
                     System.out.println(serializableGameState.toString());
                     if (serializableGameState.getConnectedPlayers().get(playerId) != null) {
                         gameManager.isHeroCreated = true;
-                        break;
+//                        break;
                     }
                 }
             } catch (SocketTimeoutException e) {
-                System.out.println("timeout");
+                e.printStackTrace();
             } catch (EOFException e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-        }
+//        }
     }
 }
