@@ -62,7 +62,6 @@ public class NetworkHandler {
                 try {
                     log.info("Connected to Game Server");
                 } catch (Exception e) {
-//                    log.error(e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -77,7 +76,6 @@ public class NetworkHandler {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-//                    log.error(e.getMessage());
                 }
             }
         });
