@@ -1,10 +1,7 @@
 package com.league.game.Handlers;
 
 import com.league.game.LeagueOfHorrors;
-import com.serializers.SerializableAbilityEntity;
-import com.serializers.SerializableGameState;
-import com.serializers.SerializableHeroEntity;
-import com.serializers.SerializedHero;
+import com.serializers.*;
 import org.json.simple.JSONObject;
 
 import java.io.*;
@@ -13,8 +10,6 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.zip.GZIPInputStream;
 
 public class UDPCreationHandler {
 
@@ -44,27 +39,15 @@ public class UDPCreationHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        while (true) {
             try {
                 gameManager.udpNetworkHandler.getClientSocket().send(outgoingDatagramPacket);
                 gameManager.udpNetworkHandler.getClientSocket().receive(incomingDatagramPacket);
-                SerializableGameState serializableGameState = null;
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(incomingDatagramPacket.getData());
-
-                ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-                Object object = objectInputStream.readObject();
-                if (object instanceof SerializableGameState) {
-                    serializableGameState = (SerializableGameState) object;
-                }
-                objectInputStream.close();
-
-                byteArrayInputStream.close();
-
+                SerializableGameStateDecorator serializableGameStateDecorator = new SerializableGameStateDecorator(new BasicSerializer());
+                SerializableGameState serializableGameState = (SerializableGameState) serializableGameStateDecorator.deserialize(incomingDatagramPacket.getData());
                 if (serializableGameState != null) {
                     System.out.println(serializableGameState.toString());
                     if (serializableGameState.getConnectedPlayers().get(playerId) != null) {
                         gameManager.isHeroCreated = true;
-//                        break;
                     }
                 }
             } catch (SocketTimeoutException e) {
@@ -76,6 +59,5 @@ public class UDPCreationHandler {
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-//        }
     }
 }
